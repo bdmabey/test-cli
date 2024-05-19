@@ -12,15 +12,15 @@ type Version struct {
 	version int
 }
 
-func NewVersion() *Version {
+func newVersion() *Version {
 	return &Version{
 		version: 12,
 	}
 }
 
 func NewVersionCommand() *cobra.Command {
-	o := NewVersion()
-	o.SetupViper()
+	o := newVersion()
+	o.setupViper()
 
 	var cmd = &cobra.Command{
 		Use:     "version",
@@ -30,7 +30,7 @@ func NewVersionCommand() *cobra.Command {
 Prints out the version.
 Can use the flag --version to set the version.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			o.RunCmd()
+			o.runCmd()
 		},
 	}
 
@@ -40,7 +40,7 @@ Can use the flag --version to set the version.`,
 	return cmd
 }
 
-func (o *Version) RunCmd() {
+func (o *Version) runCmd() {
 	viper.Set("version", 10)
 	viper.Set("version.test", 12)
 	fmt.Printf("Viper version is: %d\n", viper.GetInt("version.test"))
@@ -48,7 +48,7 @@ func (o *Version) RunCmd() {
 	fmt.Printf("Version is now set to: %d", o.version)
 }
 
-func (o *Version) SetupViper() {
+func (o *Version) setupViper() {
 	viper.SetConfigName("version")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("/Users/brade/.test-cli/version/")
