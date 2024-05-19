@@ -3,7 +3,8 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"test-cli/cmd/version"
+
+	"github.com/bdmabey/test-cli/cmd/version"
 
 	"github.com/spf13/cobra"
 )

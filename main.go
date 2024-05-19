@@ -1,7 +1,7 @@
 package main
 
 import (
-	"test-cli/cmd"
+	"github.com/bdmabey/test-cli/cmd"
 )
 
 func main() {
