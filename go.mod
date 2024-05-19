@@ -1,4 +1,4 @@
-module test-cli
+module github.com/bdmabey/test-cli
 
 go 1.22.3
 
