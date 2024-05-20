@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bdmabey/test-cli/pkg/cmdutils/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -30,6 +31,7 @@ func NewVersionCommand() *cobra.Command {
 Prints out the version.
 Can use the flag --version to set the version.`,
 		Run: func(cmd *cobra.Command, args []string) {
+			config.GetConfig("version", "version")
 			o.runCmd()
 		},
 	}

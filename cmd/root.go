@@ -26,4 +26,6 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(version.NewVersionCommand())
+	// Implement a debug flag that will show all the special debug messages in the below commands.
+	// Possibly by using a persistent flag?
 }
