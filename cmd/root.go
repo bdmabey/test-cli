@@ -28,4 +28,6 @@ func init() {
 	rootCmd.AddCommand(version.NewVersionCommand())
 	// Implement a debug flag that will show all the special debug messages in the below commands.
 	// Possibly by using a persistent flag?
+	var Debug bool
+	rootCmd.PersistentFlags().BoolVarP(&Debug, "debug", "d", false, "Enables the printing of debug messages.")
 }
