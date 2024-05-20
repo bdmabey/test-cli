@@ -2,11 +2,9 @@ package version
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/bdmabey/test-cli/pkg/cmdutils/config"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 type Version struct {
@@ -21,7 +19,6 @@ func newVersion() *Version {
 
 func NewVersionCommand() *cobra.Command {
 	o := newVersion()
-	o.setupViper()
 
 	var cmd = &cobra.Command{
 		Use:     "version",
@@ -31,40 +28,23 @@ func NewVersionCommand() *cobra.Command {
 Prints out the version.
 Can use the flag --version to set the version.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			config.GetConfig("version", "version")
-			o.runCmd()
+			o.runCmd(cmd)
 		},
 	}
 
 	cmd.Flags().IntVarP(&o.version, "version", "v", o.version, "Changes the version printed.")
-	cmd.MarkFlagRequired("version")
 
 	return cmd
 }
 
-func (o *Version) runCmd() {
-	viper.Set("version", 10)
-	viper.Set("version.test", 12)
-	fmt.Printf("Viper version is: %d\n", viper.GetInt("version.test"))
-	viper.WriteConfigAs("/Users/brade/.test-cli/version/version.yaml")
-	fmt.Printf("Version is now set to: %d", o.version)
-}
-
-func (o *Version) setupViper() {
-	viper.SetConfigName("version")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("/Users/brade/.test-cli/version/")
-
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Printf("Config file not found. Attempting to create...\n")
-			if err := os.WriteFile("/Users/brade/.test-cli/version/version.yaml", []byte("---"), 0666); err != nil {
-				panic(fmt.Errorf("could not create the file: %w", err))
-			} else {
-				fmt.Println("File created successfully")
-			}
-		} else {
-			fmt.Println("File found but something else happened.")
-		}
+// If the version flag is set then it will print that.
+// If it is not set it will set version to what is in the viper config.
+func (o *Version) runCmd(cmd *cobra.Command) {
+	v, _ := config.GetConfig("version", "version")
+	v.BindPFlag("version", cmd.Flags().Lookup("version"))
+	if cmd.Flags().Lookup("version").Changed {
+		fmt.Printf("The default version is: %d\n", o.version)
+	} else {
+		fmt.Printf("Version in file is: %s\n", v.GetString("version"))
 	}
 }
