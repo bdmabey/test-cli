@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/bdmabey/test-cli/cmd"
-	"github.com/bdmabey/test-cli/pkg/cmdutils/config"
+	"github.com/bdmabey/test-cli/pkg/util/config"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package version
 import (
 	"fmt"
 
-	"github.com/bdmabey/test-cli/pkg/cmdutils/config"
+	"github.com/bdmabey/test-cli/pkg/util/config"
 	"github.com/spf13/cobra"
 )
 
@@ -28,7 +28,7 @@ func NewVersionCommand() *cobra.Command {
 Prints out the version.
 Can use the flag --version to set the version.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			o.runCmd(cmd)
+			o.RunCmd(cmd)
 		},
 	}
 
@@ -39,7 +39,7 @@ Can use the flag --version to set the version.`,
 
 // If the version flag is set then it will print that.
 // If it is not set it will set version to what is in the viper config.
-func (o *Version) runCmd(cmd *cobra.Command) {
+func (o *Version) RunCmd(cmd *cobra.Command) {
 	v, _ := config.GetConfig("version", "version")
 	v.BindPFlag("version", cmd.Flags().Lookup("version"))
 	if cmd.Flags().Lookup("version").Changed {
