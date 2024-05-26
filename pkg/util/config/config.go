@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bdmabey/test-cli/pkg/util/debug"
+
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -13,7 +16,7 @@ func CreateMainConfigPath() error {
 		panic(fmt.Errorf("unable to locate user home dir: %w", err))
 	} else {
 		mainConfigPath := userPath + "/.test-cli/"
-		if err := os.MkdirAll(mainConfigPath, 0666); err != nil {
+		if err := os.MkdirAll(mainConfigPath, 0755); err != nil {
 			panic(fmt.Errorf("unable to create configuration directory in the user home directory: %w", err))
 		}
 	}
@@ -26,7 +29,7 @@ type Config struct {
 }
 
 // Creates a new config object
-func newConfig(cmd string) *Config {
+func newConfig(cmd *cobra.Command) *Config {
 	return &Config{
 		configPath: setCmdConfigPath(cmd),
 	}
@@ -36,31 +39,35 @@ func newConfig(cmd string) *Config {
 // Each command will somehow need to check and make sure their folder is made
 // If it isn't create it and create a default config file.
 // If it is cool, set the configPath to that.
-func setCmdConfigPath(cmd string) string {
+func setCmdConfigPath(cmd *cobra.Command) string {
 	// Checks to see if we can get the home directory of the user.
 	if userPath, err := os.UserHomeDir(); err != nil {
 		panic(fmt.Errorf("unable to locate user home dir: %w", err))
 	} else {
 		// need to ensure the directory is created. if not there create it.
-		configPath := userPath + "/.test-cli/" + cmd + "/"
-		if err := os.MkdirAll(configPath, 0666); err != nil {
+		configPath := userPath + "/.test-cli/" + cmd.Use + "/"
+		if err := os.MkdirAll(configPath, 0755); err != nil {
 			panic(fmt.Errorf("unable to create configuration directory in the home directory: %w", err))
+		} else {
+			msg := cmd.Use + " folder exists/created."
+			debug.Print(cmd, msg)
 		}
 		return configPath
 	}
 }
 
 // Creates a new config file if one does not exist when get config is called.
-func (o *Config) createConfigFile(cmd string) {
-	if err := os.WriteFile(o.configPath+cmd+".yaml", []byte("---"), 0666); err != nil {
-		panic(fmt.Errorf("could not create configuration file for %s: %w", cmd, err))
+func (o *Config) createConfigFile(cmd *cobra.Command) {
+	if err := os.WriteFile(o.configPath+cmd.Use+".yaml", []byte("---"), 0755); err != nil {
+		panic(fmt.Errorf("could not create configuration file for %s: %w", cmd.Use, err))
 	} else {
-		fmt.Printf("%s file created successfully\n", (cmd + ".yaml"))
+		msg := cmd.Use + " file created successfully" + ".yaml"
+		debug.Print(cmd, msg)
 	}
 }
 
 // Gets specific config requested by any command.
-func GetConfig(filename string, cmd string) (*viper.Viper, error) {
+func GetConfig(filename string, cmd *cobra.Command) (*viper.Viper, error) {
 	v := viper.New()
 	o := newConfig(cmd)
 	v.SetConfigName(filename)
@@ -69,11 +76,14 @@ func GetConfig(filename string, cmd string) (*viper.Viper, error) {
 
 	if err := v.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			fmt.Println("Config file not found. Attempting to create...")
+			debug.Print(cmd, "Config file not found. Attempting to create...")
 			o.createConfigFile(cmd)
 		} else {
-			fmt.Println("File found but something happened while loading it.")
+			debug.Print(cmd, "File found but something happened while loading it.")
 		}
+	} else {
+		msg := cmd.Use + " configuration file loaded successfully."
+		debug.Print(cmd, msg)
 	}
 
 	return v, nil

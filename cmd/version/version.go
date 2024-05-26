@@ -3,7 +3,9 @@ package version
 import (
 	"fmt"
 
+	"github.com/bdmabey/test-cli/pkg/util"
 	"github.com/bdmabey/test-cli/pkg/util/config"
+
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +34,7 @@ Can use the flag --version to set the version.`,
 		},
 	}
 
+	util.AddDebugFlag(cmd)
 	cmd.Flags().IntVarP(&o.version, "version", "v", o.version, "Changes the version printed.")
 
 	return cmd
@@ -40,7 +43,7 @@ Can use the flag --version to set the version.`,
 // If the version flag is set then it will print that.
 // If it is not set it will set version to what is in the viper config.
 func (o *Version) RunCmd(cmd *cobra.Command) {
-	v, _ := config.GetConfig("version", "version")
+	v, _ := config.GetConfig("version", cmd)
 	v.BindPFlag("version", cmd.Flags().Lookup("version"))
 	if cmd.Flags().Lookup("version").Changed {
 		fmt.Printf("The default version is: %d\n", o.version)
